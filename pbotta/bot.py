@@ -58,7 +58,14 @@ class PBotTA(discord.Client):
             # Sincronizzazione immediata su un server di prova.
             guild = discord.Object(id=int(guild_id))
             self.tree.copy_global_to(guild=guild)
-            await self.tree.sync(guild=guild)
+            try:
+                await self.tree.sync(guild=guild)
+            except discord.Forbidden:
+                log.error(
+                    "Impossibile registrare i comandi sul server %s: invita il bot con gli scope "
+                    "'bot' e 'applications.commands' e controlla DISCORD_GUILD_ID, poi riavvia",
+                    guild_id,
+                )
         else:
             await self.tree.sync()
 
