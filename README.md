@@ -4,7 +4,9 @@ Dice roller Discord per i giochi *Powered by the Apocalypse*.
 
 ## Comando
 
-`/roll [mod] [modalita] [nota]`
+`/pbta [mod] [modalita] [nota]`
+
+Il nome del comando si può cambiare con `COMMAND_NAME` in `.env` (solo minuscole, cifre, `-` e `_`).
 
 - `mod`: modificatore da -10 a +10 (default 0)
 - `modalita`: normale, vantaggio o svantaggio (3d6, tiene i due migliori o peggiori)

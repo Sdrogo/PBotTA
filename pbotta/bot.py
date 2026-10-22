@@ -1,9 +1,10 @@
-"""Bot Discord: espone il comando /roll."""
+"""Bot Discord: espone il comando di tiro (default /pbta)."""
 
 from __future__ import annotations
 
 import logging
 import os
+import re
 
 import discord
 from discord import app_commands
@@ -11,6 +12,20 @@ from discord import app_commands
 from pbotta.dice import MAX_MODIFIER, MIN_MODIFIER, Mode, Outcome, RollResult, roll
 
 log = logging.getLogger("pbotta")
+
+PLACEHOLDER_TOKEN = "inserisci-qui-il-token"
+DEFAULT_COMMAND_NAME = "pbta"
+COMMAND_NAME_PATTERN = re.compile(r"^[-_a-z0-9]{1,32}$")
+
+
+def command_name() -> str:
+    """Nome dello slash command, configurabile con COMMAND_NAME."""
+    name = os.getenv("COMMAND_NAME", "").strip() or DEFAULT_COMMAND_NAME
+    if not COMMAND_NAME_PATTERN.fullmatch(name):
+        raise SystemExit(
+            f"COMMAND_NAME non valido: {name!r} (solo minuscole, cifre, '-' e '_', max 32 caratteri)"
+        )
+    return name
 
 COLORS = {
     Outcome.STRONG_HIT: discord.Color.green(),
@@ -56,7 +71,14 @@ class PBotTA(discord.Client):
             # Sincronizzazione immediata su un server di prova.
             guild = discord.Object(id=int(guild_id))
             self.tree.copy_global_to(guild=guild)
-            await self.tree.sync(guild=guild)
+            try:
+                await self.tree.sync(guild=guild)
+            except discord.Forbidden:
+                log.error(
+                    "Impossibile registrare i comandi sul server %s: invita il bot con gli scope "
+                    "'bot' e 'applications.commands' e controlla DISCORD_GUILD_ID, poi riavvia",
+                    guild_id,
+                )
         else:
             await self.tree.sync()
 
@@ -67,7 +89,7 @@ class PBotTA(discord.Client):
 client = PBotTA()
 
 
-@client.tree.command(name="roll", description="Tira 2d6 + modificatore (PbtA)")
+@client.tree.command(name=command_name(), description="Tira 2d6 + modificatore (PbtA)")
 @app_commands.describe(
     mod="Modificatore da aggiungere al tiro",
     modalita="Vantaggio o svantaggio: tira 3d6 e tiene i due migliori o peggiori",
@@ -89,10 +111,15 @@ async def roll_command(
 
 def main() -> None:
     logging.basicConfig(level=logging.INFO)
-    token = os.environ.get("DISCORD_TOKEN")
-    if not token:
-        raise SystemExit("Variabile d'ambiente DISCORD_TOKEN mancante")
-    client.run(token, log_handler=None)
+    token = os.environ.get("DISCORD_TOKEN", "").strip()
+    if not token or token == PLACEHOLDER_TOKEN:
+        raise SystemExit("DISCORD_TOKEN mancante: inserisci il token del bot nel file .env")
+    try:
+        client.run(token, log_handler=None)
+    except discord.LoginFailure:
+        raise SystemExit(
+            "Token Discord non valido: rigeneralo da Developer Portal → Bot → Reset Token e aggiorna .env"
+        ) from None
 
 
 if __name__ == "__main__":
