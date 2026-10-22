@@ -39,3 +39,8 @@ Guida completa a Developer Portal e deploy: [docs/setup-discord.md](docs/setup-d
 ```bash
 pytest
 ```
+
+## Legale
+
+- [Termini di Servizio](docs/terms.md)
+- [Informativa sulla privacy](docs/privacy.md)
