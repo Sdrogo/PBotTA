@@ -12,6 +12,8 @@ from pbotta.dice import MAX_MODIFIER, MIN_MODIFIER, Mode, Outcome, RollResult, r
 
 log = logging.getLogger("pbotta")
 
+PLACEHOLDER_TOKEN = "inserisci-qui-il-token"
+
 COLORS = {
     Outcome.STRONG_HIT: discord.Color.green(),
     Outcome.WEAK_HIT: discord.Color.gold(),
@@ -89,10 +91,15 @@ async def roll_command(
 
 def main() -> None:
     logging.basicConfig(level=logging.INFO)
-    token = os.environ.get("DISCORD_TOKEN")
-    if not token:
-        raise SystemExit("Variabile d'ambiente DISCORD_TOKEN mancante")
-    client.run(token, log_handler=None)
+    token = os.environ.get("DISCORD_TOKEN", "").strip()
+    if not token or token == PLACEHOLDER_TOKEN:
+        raise SystemExit("DISCORD_TOKEN mancante: inserisci il token del bot nel file .env")
+    try:
+        client.run(token, log_handler=None)
+    except discord.LoginFailure:
+        raise SystemExit(
+            "Token Discord non valido: rigeneralo da Developer Portal → Bot → Reset Token e aggiorna .env"
+        ) from None
 
 
 if __name__ == "__main__":
