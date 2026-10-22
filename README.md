@@ -23,6 +23,15 @@ python -m pbotta.bot
 
 Con `DISCORD_GUILD_ID` impostato i comandi vengono registrati subito su quel server; senza, la registrazione globale può richiedere fino a un'ora.
 
+## Docker
+
+```bash
+cp .env.example .env   # inserisci il token
+docker compose up -d --build
+```
+
+Guida completa a Developer Portal e deploy: [docs/setup-discord.md](docs/setup-discord.md).
+
 ## Test
 
 ```bash

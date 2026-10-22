@@ -1,0 +1,12 @@
+services:
+  pbotta:
+    build: .
+    image: pbotta:latest
+    container_name: pbotta
+    restart: unless-stopped
+    env_file: .env
+    logging:
+      driver: json-file
+      options:
+        max-size: "5m"
+        max-file: "3"
