@@ -1,9 +1,10 @@
-"""Bot Discord: espone il comando /roll."""
+"""Bot Discord: espone il comando di tiro (default /pbta)."""
 
 from __future__ import annotations
 
 import logging
 import os
+import re
 
 import discord
 from discord import app_commands
@@ -13,6 +14,18 @@ from pbotta.dice import MAX_MODIFIER, MIN_MODIFIER, Mode, Outcome, RollResult, r
 log = logging.getLogger("pbotta")
 
 PLACEHOLDER_TOKEN = "inserisci-qui-il-token"
+DEFAULT_COMMAND_NAME = "pbta"
+COMMAND_NAME_PATTERN = re.compile(r"^[-_a-z0-9]{1,32}$")
+
+
+def command_name() -> str:
+    """Nome dello slash command, configurabile con COMMAND_NAME."""
+    name = os.getenv("COMMAND_NAME", "").strip() or DEFAULT_COMMAND_NAME
+    if not COMMAND_NAME_PATTERN.fullmatch(name):
+        raise SystemExit(
+            f"COMMAND_NAME non valido: {name!r} (solo minuscole, cifre, '-' e '_', max 32 caratteri)"
+        )
+    return name
 
 COLORS = {
     Outcome.STRONG_HIT: discord.Color.green(),
@@ -76,7 +89,7 @@ class PBotTA(discord.Client):
 client = PBotTA()
 
 
-@client.tree.command(name="roll", description="Tira 2d6 + modificatore (PbtA)")
+@client.tree.command(name=command_name(), description="Tira 2d6 + modificatore (PbtA)")
 @app_commands.describe(
     mod="Modificatore da aggiungere al tiro",
     modalita="Vantaggio o svantaggio: tira 3d6 e tiene i due migliori o peggiori",
