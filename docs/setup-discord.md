@@ -9,7 +9,7 @@
    - Scope: `bot` e `applications.commands`.
    - Permessi del bot: `Send Messages`, `Embed Links`. Bastano questi.
    - Copia il link d'invito e aprilo per aggiungere il bot a un server.
-4. **Server di prova (facoltativo)**: attiva la modalità sviluppatore in Discord (*Impostazioni → Avanzate*), tasto destro sul server → *Copia ID server* e mettilo in `.env` come `DISCORD_GUILD_ID`. I comandi compaiono subito su quel server; senza questa variabile la registrazione globale può richiedere fino a un'ora.
+4. **Server di prova (facoltativo)**: attiva la modalità sviluppatore in Discord (*Impostazioni → Avanzate*), tasto destro sul server → *Copia ID server* e mettilo in `.env` come `DISCORD_GUILD_ID`. I comandi sono sempre registrati globalmente su tutti i server (la prima volta può servire fino a un'ora); questa variabile serve solo a rimuovere eventuali vecchie copie registrate solo su quel server.
 
 # Deploy sulla VPS con Docker
 

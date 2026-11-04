@@ -66,21 +66,19 @@ class PBotTA(discord.Client):
         self.tree = app_commands.CommandTree(self)
 
     async def setup_hook(self) -> None:
-        guild_id = os.getenv("DISCORD_GUILD_ID")
+        # I comandi vanno sempre registrati globalmente, altrimenti compaiono
+        # solo sul server di prova e non sugli altri server dove il bot è invitato.
+        await self.tree.sync()
+        guild_id = os.getenv("DISCORD_GUILD_ID", "").strip()
         if guild_id:
-            # Sincronizzazione immediata su un server di prova.
+            # Rimuove eventuali copie registrate in passato solo su questo server,
+            # per non vedere il comando duplicato accanto a quello globale.
             guild = discord.Object(id=int(guild_id))
-            self.tree.copy_global_to(guild=guild)
+            self.tree.clear_commands(guild=guild)
             try:
                 await self.tree.sync(guild=guild)
             except discord.Forbidden:
-                log.error(
-                    "Impossibile registrare i comandi sul server %s: invita il bot con gli scope "
-                    "'bot' e 'applications.commands' e controlla DISCORD_GUILD_ID, poi riavvia",
-                    guild_id,
-                )
-        else:
-            await self.tree.sync()
+                log.warning("Impossibile ripulire i comandi del server %s (ignoro)", guild_id)
 
     async def on_ready(self) -> None:
         log.info("Connesso come %s", self.user)

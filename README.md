@@ -23,7 +23,7 @@ export $(grep -v '^#' .env | xargs)
 python -m pbotta.bot
 ```
 
-Con `DISCORD_GUILD_ID` impostato i comandi vengono registrati subito su quel server; senza, la registrazione globale può richiedere fino a un'ora.
+I comandi sono sempre registrati globalmente (disponibili su tutti i server dove il bot è invitato; la prima volta può servire fino a un'ora). `DISCORD_GUILD_ID` è facoltativo e serve solo a ripulire i comandi registrati in passato su un singolo server.
 
 ## Docker
 
